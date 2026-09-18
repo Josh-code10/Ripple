@@ -113,8 +113,8 @@ export default function Home() {
 
           {/* Hero Subtext */}
           <p className="mt-6 text-lg sm:text-xl font-normal leading-relaxed text-[#1b507e] max-w-2xl mx-auto">
-            Ripple showcases real tools built on Cardtonic&apos;s business card API — created
-            by verified Upskill graduates, proving what&apos;s possible before you integrate.
+            Ripple showcases a working simulation built on Cardtonic&apos;s business card API — created
+            by a Cardtonic Upskill applicant, proving what&apos;s possible before you integrate.
           </p>
 
           {/* Action Buttons */}

@@ -10,9 +10,9 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Ripple — Cardtonic Pil API Real-World Proof & Showcase",
+  title: "Ripple — A Pilot for Cardtonic's Pil API",
   description:
-    "Explore real tools and enterprise integrations built on Cardtonic's business card API by verified Upskill graduates, proving what's possible before you integrate.",
+    "A working solo pilot simulating Cardtonic's upcoming Pil API — built by one Upskill applicant, honestly labeled, not an official Cardtonic product.",
   icons: {
     icon: "/logo.png",
     apple: "/logo.png",
