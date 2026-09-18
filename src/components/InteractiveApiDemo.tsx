@@ -26,9 +26,32 @@ interface FraudCheckData {
   isFirstTransaction?: boolean;
 }
 
+const INITIAL_DEMO_CARDS: VirtualCardItem[] = [
+  {
+    id: "card_marketing_demo",
+    label: "Marketing Campaigns",
+    maskedCardNumber: "4242 •••• •••• 4242",
+    last4: "4242",
+    balance: 1200,
+    currency: "USD",
+    status: "active",
+    expiry: "12/29",
+  },
+  {
+    id: "card_operations_demo",
+    label: "Cloud & SaaS Tooling",
+    maskedCardNumber: "4242 •••• •••• 8821",
+    last4: "8821",
+    balance: 2450,
+    currency: "USD",
+    status: "active",
+    expiry: "08/28",
+  },
+];
+
 export default function InteractiveApiDemo() {
-  const [cards, setCards] = useState<VirtualCardItem[]>([]);
-  const [selectedCardId, setSelectedCardId] = useState<string>("");
+  const [cards, setCards] = useState<VirtualCardItem[]>(INITIAL_DEMO_CARDS);
+  const [selectedCardId, setSelectedCardId] = useState<string>("card_marketing_demo");
   const [activeTab, setActiveTab] = useState<"issue" | "fund" | "fraud">("issue");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -52,11 +75,12 @@ export default function InteractiveApiDemo() {
     try {
       const res = await fetch("/api/cards");
       const data = await res.json();
-      if (data.cards && Array.isArray(data.cards)) {
+      if (data.cards && Array.isArray(data.cards) && data.cards.length > 0) {
         setCards(data.cards);
-        if (data.cards.length > 0 && !selectedCardId) {
-          setSelectedCardId(data.cards[0].id);
-        }
+        setSelectedCardId((currentId) => {
+          const exists = data.cards.some((c: VirtualCardItem) => c.id === currentId);
+          return exists ? currentId : data.cards[0].id;
+        });
       }
     } catch {
       // silently fallback

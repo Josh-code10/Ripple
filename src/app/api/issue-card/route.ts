@@ -1,8 +1,17 @@
-import { NextResponse } from "next/server";
-import { issueCard } from "@/lib/cardsStore";
+import { NextRequest, NextResponse } from "next/server";
+import {
+  issueCard,
+  getAllCards,
+  syncCardsFromCookie,
+  serializeCards,
+  COOKIE_NAME,
+} from "@/lib/cardsStore";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    const cookieValue = request.cookies.get(COOKIE_NAME)?.value;
+    syncCardsFromCookie(cookieValue);
+
     const body = await request.json();
     const { label, startingBalance } = body ?? {};
 
@@ -22,8 +31,9 @@ export async function POST(request: Request) {
     }
 
     const newCard = issueCard(label.trim(), numericBalance);
+    const allCards = getAllCards();
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         message: "Virtual card successfully issued.",
         card: {
@@ -41,6 +51,16 @@ export async function POST(request: Request) {
       },
       { status: 201 }
     );
+
+    // Persist new card to session cookie so all other serverless lambdas receive it
+    response.cookies.set(COOKIE_NAME, serializeCards(allCards), {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+
+    return response;
   } catch {
     return NextResponse.json(
       { error: "Invalid JSON request body." },

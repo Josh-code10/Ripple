@@ -1,10 +1,19 @@
-import { NextResponse } from "next/server";
-import { getAllCards } from "@/lib/cardsStore";
+import { NextRequest, NextResponse } from "next/server";
+import {
+  getAllCards,
+  syncCardsFromCookie,
+  serializeCards,
+  COOKIE_NAME,
+} from "@/lib/cardsStore";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Sync any session state from incoming request cookies
+  const cookieValue = request.cookies.get(COOKIE_NAME)?.value;
+  syncCardsFromCookie(cookieValue);
+
   const cards = getAllCards();
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     count: cards.length,
     cards: cards.map((card) => ({
       id: card.id,
@@ -19,4 +28,14 @@ export async function GET() {
       transactionCount: card.transactions.length,
     })),
   });
+
+  // Ensure cookie is refreshed for cross-lambda persistence
+  response.cookies.set(COOKIE_NAME, serializeCards(cards), {
+    path: "/",
+    httpOnly: true,
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 7, // 7 days
+  });
+
+  return response;
 }
